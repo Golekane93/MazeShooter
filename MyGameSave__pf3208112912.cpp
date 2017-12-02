@@ -28,6 +28,7 @@ UMyGameSave_C__pf3208112912::UMyGameSave_C__pf3208112912(const FObjectInitialize
 	bpv__c4__pf = false;
 	bpv__PlayerStart2__pf = FVector(0.000000, 0.000000, 0.000000);
 	bpv__level__pf = 0;
+	bpv__end__pf = false;
 }
 void UMyGameSave_C__pf3208112912::PostLoadSubobjects(FObjectInstancingGraph* OuterInstanceGraph)
 {

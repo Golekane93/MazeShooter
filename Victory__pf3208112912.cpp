@@ -410,6 +410,8 @@ UVictory_C__pf3208112912::UVictory_C__pf3208112912(const FObjectInitializer& Obj
 		UVictory_C__pf3208112912::__CustomDynamicClassInitialization(CastChecked<UDynamicClass>(GetClass()));
 	}
 	
+	bIsFocusable = true;
+	bOverride_Cursor = true;
 }
 void UVictory_C__pf3208112912::PostLoadSubobjects(FObjectInstancingGraph* OuterInstanceGraph)
 {

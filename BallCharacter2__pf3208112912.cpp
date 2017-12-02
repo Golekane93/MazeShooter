@@ -12,6 +12,7 @@
 #include "Runtime/Engine/Classes/AI/Navigation/NavAreas/NavArea.h"
 #include "Runtime/Engine/Classes/AI/Navigation/NavigationTypes.h"
 #include "Runtime/AIModule/Classes/Perception/PawnSensingComponent.h"
+#include "Runtime/Engine/Classes/Components/SpotLightComponent.h"
 #include "Runtime/Engine/Classes/Components/SceneComponent.h"
 #include "BallCharacter2__pf3208112912.h"
 #include "Runtime/Engine/Classes/Components/MeshComponent.h"
@@ -185,10 +186,14 @@
 #include "Runtime/Engine/Classes/Components/ChildActorComponent.h"
 #include "Runtime/Engine/Classes/EdGraph/EdGraphPin.h"
 #include "Runtime/Engine/Classes/AI/Navigation/NavRelevantInterface.h"
+#include "Runtime/Engine/Classes/Components/PointLightComponent.h"
+#include "Runtime/Engine/Classes/Components/LightComponent.h"
+#include "Runtime/Engine/Classes/Components/LightComponentBase.h"
+#include "Runtime/Engine/Classes/Engine/TextureLightProfile.h"
+#include "EnergyBall__pf3208112912.h"
 #include "PhysicsBallBP__pf3208112912.h"
 #include "FirstPersonProjectile__pf3208112912.h"
 #include "Runtime/AIModule/Classes/Blueprint/AIAsyncTaskBlueprintProxy.h"
-#include "EnergyBall__pf3208112912.h"
 #include "Runtime/Engine/Classes/Kismet/KismetMathLibrary.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 #include "Runtime/Engine/Classes/Sound/ReverbEffect.h"
@@ -233,19 +238,18 @@
 #include "Runtime/Engine/Classes/Kismet/KismetSystemLibrary.h"
 #include "Runtime/AIModule/Classes/Blueprint/AIBlueprintHelperLibrary.h"
 #include "Runtime/Engine/Classes/Engine/BlueprintGeneratedClass.h"
-#include "MyGameSave__pf3208112912.h"
 #include "BallCharacter__pf3208112912.h"
 #include "EnemyProjectile__pf3208112912.h"
 #include "CharCamShake__pf895046141.h"
 #include "BallCharacter3__pf3208112912.h"
 #include "Victory__pf3208112912.h"
+#include "MyGameSave__pf3208112912.h"
 #include "checkpoint__pf3208112912.h"
 #include "HUDisplay__pf3208112912.h"
 #include "PauseScreen__pf3208112912.h"
 #include "Options__pf3208112912.h"
 #include "StartScreen__pf3208112912.h"
 #include "About__pf3208112912.h"
-#include "GameOver__pf3208112912.h"
 void ABallCharacter2_C__pf3208112912::__CustomDynamicClassInitialization(UDynamicClass* InDynamicClass)
 {
 	ensure(0 == InDynamicClass->ReferencedConvertedFields.Num());
@@ -256,16 +260,14 @@ void ABallCharacter2_C__pf3208112912::__CustomDynamicClassInitialization(UDynami
 	ensure(0 == InDynamicClass->Timelines.Num());
 	ensure(nullptr == InDynamicClass->AnimClassImplementation);
 	// List of all referenced converted classes
+	extern UClass* Z_Construct_UClass_AEnergyBall_C__pf3208112912();
+	InDynamicClass->ReferencedConvertedFields.Add(Z_Construct_UClass_AEnergyBall_C__pf3208112912());
 	extern UClass* Z_Construct_UClass_APhysicsBallBP_C__pf3208112912();
 	InDynamicClass->ReferencedConvertedFields.Add(Z_Construct_UClass_APhysicsBallBP_C__pf3208112912());
-	extern UClass* Z_Construct_UClass_UMyGameSave_C__pf3208112912();
-	InDynamicClass->ReferencedConvertedFields.Add(Z_Construct_UClass_UMyGameSave_C__pf3208112912());
 	extern UClass* Z_Construct_UClass_AFirstPersonProjectile_C__pf3208112912();
 	InDynamicClass->ReferencedConvertedFields.Add(Z_Construct_UClass_AFirstPersonProjectile_C__pf3208112912());
 	extern UClass* Z_Construct_UClass_ABallCharacter_C__pf3208112912();
 	InDynamicClass->ReferencedConvertedFields.Add(Z_Construct_UClass_ABallCharacter_C__pf3208112912());
-	extern UClass* Z_Construct_UClass_AEnergyBall_C__pf3208112912();
-	InDynamicClass->ReferencedConvertedFields.Add(Z_Construct_UClass_AEnergyBall_C__pf3208112912());
 	extern UClass* Z_Construct_UClass_AEnemyProjectile_C__pf3208112912();
 	InDynamicClass->ReferencedConvertedFields.Add(Z_Construct_UClass_AEnemyProjectile_C__pf3208112912());
 	extern UClass* Z_Construct_UClass_UCharCamShake_C__pf895046141();
@@ -274,6 +276,8 @@ void ABallCharacter2_C__pf3208112912::__CustomDynamicClassInitialization(UDynami
 	InDynamicClass->ReferencedConvertedFields.Add(Z_Construct_UClass_ABallCharacter3_C__pf3208112912());
 	extern UClass* Z_Construct_UClass_UVictory_C__pf3208112912();
 	InDynamicClass->ReferencedConvertedFields.Add(Z_Construct_UClass_UVictory_C__pf3208112912());
+	extern UClass* Z_Construct_UClass_UMyGameSave_C__pf3208112912();
+	InDynamicClass->ReferencedConvertedFields.Add(Z_Construct_UClass_UMyGameSave_C__pf3208112912());
 	extern UClass* Z_Construct_UClass_Ucheckpoint_C__pf3208112912();
 	InDynamicClass->ReferencedConvertedFields.Add(Z_Construct_UClass_Ucheckpoint_C__pf3208112912());
 	extern UClass* Z_Construct_UClass_UHUDisplay_C__pf3208112912();
@@ -286,19 +290,15 @@ void ABallCharacter2_C__pf3208112912::__CustomDynamicClassInitialization(UDynami
 	InDynamicClass->ReferencedConvertedFields.Add(Z_Construct_UClass_UStartScreen_C__pf3208112912());
 	extern UClass* Z_Construct_UClass_UAbout_C__pf3208112912();
 	InDynamicClass->ReferencedConvertedFields.Add(Z_Construct_UClass_UAbout_C__pf3208112912());
-	extern UClass* Z_Construct_UClass_UGameOver_C__pf3208112912();
-	InDynamicClass->ReferencedConvertedFields.Add(Z_Construct_UClass_UGameOver_C__pf3208112912());
 	// List of all referenced assets
 	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Engine/BasicShapes/Sphere.Sphere")));
 	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Game/StarterContent/Materials/M_Metal_Rust.M_Metal_Rust")));
+	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Game/InfinityBladeEffects/Effects/FX_Materials/Lightning/M_JaggedRockLightning_MeshEmit_Lit_INST.M_JaggedRockLightning_MeshEmit_Lit_INST")));
 	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Game/Rolling/Meshes/BallMesh.BallMesh")));
 	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Game/StarterContent/Materials/M_Metal_Burnished_Steel.M_Metal_Burnished_Steel")));
 	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Game/InfinityBladeEffects/Effects/FX_Materials/Fire/M_JaggedRockFire_MeshEmit_Lit.M_JaggedRockFire_MeshEmit_Lit")));
 	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Game/StarterContent/Materials/M_Metal_Steel.M_Metal_Steel")));
 	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Game/InfinityBladeEffects/Effects/FX_Materials/ICE/M_JaggedRockIce_MeshEmit.M_JaggedRockIce_MeshEmit")));
-	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Game/InfinityBladeEffects/Effects/FX_Materials/Lightning/M_JaggedRockLightning_MeshEmit_Lit_INST.M_JaggedRockLightning_MeshEmit_Lit_INST")));
-	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Game/InfinityBladeEffects/Effects/FX_Ability/Heal/P_Heal_Pickup.P_Heal_Pickup")));
-	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Game/StarterContent/Gobble.Gobble")));
 	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Game/InfinityBladeEffects/Effects/FX_Materials/ICE/M_JaggedRockIce_MeshEmit_Blue.M_JaggedRockIce_MeshEmit_Blue")));
 	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Game/StarterContent/Audio/Explosion_Cue.Explosion_Cue")));
 	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Game/StarterContent/Particles/P_Explosion.P_Explosion")));
@@ -308,9 +308,10 @@ void ABallCharacter2_C__pf3208112912::__CustomDynamicClassInitialization(UDynami
 	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Game/Fonts/Atmosphere/Atmosphere-Light.Atmosphere-Light")));
 	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Engine/EngineFonts/Roboto.Roboto")));
 	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Game/StarterContent/Moving.Moving")));
-	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Game/StarterContent/Energy_Critical.Energy_Critical")));
-	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Game/StarterContent/Level_Cleared_________________Advance_Stage.Level_Cleared_________________Advance_Stage")));
 	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Game/StarterContent/Check_Point.Check_Point")));
+	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Game/StarterContent/Energy_Critical.Energy_Critical")));
+	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Game/InfinityBladeEffects/Effects/FX_Ability/Heal/P_Heal_Pickup.P_Heal_Pickup")));
+	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Game/StarterContent/Gobble.Gobble")));
 	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Game/StarterContent/Scrap.Scrap")));
 	auto __Local__0 = NewObject<UComponentDelegateBinding>(InDynamicClass, UComponentDelegateBinding::StaticClass(), TEXT("ComponentDelegateBinding_3"));
 	InDynamicClass->DynamicBindingObjects.Add(__Local__0);
@@ -334,6 +335,7 @@ ABallCharacter2_C__pf3208112912::ABallCharacter2_C__pf3208112912(const FObjectIn
 	bpv__Sphere__pf = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Sphere"));
 	bpv__Sphere1__pf = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere1"));
 	bpv__PawnSensing__pf = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensing"));
+	bpv__SpotLight__pf = CreateDefaultSubobject<USpotLightComponent>(TEXT("SpotLight"));
 	bpv__Sphere__pf->CreationMethod = EComponentCreationMethod::Native;
 	bpv__Sphere__pf->AttachToComponent(__Local__1, FAttachmentTransformRules::KeepRelativeTransform );
 	bpv__Sphere__pf->StaticMesh = CastChecked<UStaticMesh>(CastChecked<UDynamicClass>(ABallCharacter2_C__pf3208112912::StaticClass())->UsedAssets[0], ECastCheckedType::NullAllowed);
@@ -365,7 +367,17 @@ ABallCharacter2_C__pf3208112912::ABallCharacter2_C__pf3208112912(const FObjectIn
 	}
 	auto& __Local__6 = (*(__Local__4->ContainerPtrToValuePtr<float >((bpv__PawnSensing__pf), 0)));
 	__Local__6 = 180.000000f;
-	bpv__EnemyEnergy__pf = 100.000000f;
+	bpv__SpotLight__pf->CreationMethod = EComponentCreationMethod::Native;
+	bpv__SpotLight__pf->AttachToComponent(__Local__1, FAttachmentTransformRules::KeepRelativeTransform );
+	bpv__SpotLight__pf->OuterConeAngle = 17.183479f;
+	bpv__SpotLight__pf->AttenuationRadius = 106.825745f;
+	bpv__SpotLight__pf->LightGuid = FGuid(0x6ECC8220, 0x4F85C183, 0x79BDAF8B, 0x5A1D27F2);
+	bpv__SpotLight__pf->Intensity = 100000.000000f;
+	bpv__SpotLight__pf->LightColor = FColor(41, 255, 0, 255);
+	bpv__SpotLight__pf->bPrecomputedLightingIsValid = false;
+	bpv__SpotLight__pf->RelativeLocation = FVector(-0.000004, 0.000126, 60.000038);
+	bpv__SpotLight__pf->RelativeRotation = FRotator(-90.000000, 0.000000, 89.999939);
+	bpv__EnemyEnergy__pf = 200.000000f;
 	bpv__DistanceFromEnemy__pf = 0.000000f;
 	bUseControllerRotationPitch = true;
 	bUseControllerRotationRoll = true;
@@ -386,19 +398,21 @@ void ABallCharacter2_C__pf3208112912::PostLoadSubobjects(FObjectInstancingGraph*
 	{
 		bpv__PawnSensing__pf->CreationMethod = EComponentCreationMethod::Native;
 	}
+	if(bpv__SpotLight__pf)
+	{
+		bpv__SpotLight__pf->CreationMethod = EComponentCreationMethod::Native;
+	}
 }
 void ABallCharacter2_C__pf3208112912::__StaticDependenciesAssets(TArray<FBlueprintDependencyData>& AssetsToLoad)
 {
 	AssetsToLoad.Add({FName(TEXT("/Engine/BasicShapes/Sphere")), FName(TEXT("Sphere")), FName(TEXT("/Script/Engine")), FName(TEXT("StaticMesh"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/StarterContent/Materials/M_Metal_Rust")), FName(TEXT("M_Metal_Rust")), FName(TEXT("/Script/Engine")), FName(TEXT("Material"))});
+	AssetsToLoad.Add({FName(TEXT("/Game/InfinityBladeEffects/Effects/FX_Materials/Lightning/M_JaggedRockLightning_MeshEmit_Lit_INST")), FName(TEXT("M_JaggedRockLightning_MeshEmit_Lit_INST")), FName(TEXT("/Script/Engine")), FName(TEXT("MaterialInstanceConstant"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/Rolling/Meshes/BallMesh")), FName(TEXT("BallMesh")), FName(TEXT("/Script/Engine")), FName(TEXT("StaticMesh"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/StarterContent/Materials/M_Metal_Burnished_Steel")), FName(TEXT("M_Metal_Burnished_Steel")), FName(TEXT("/Script/Engine")), FName(TEXT("Material"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/InfinityBladeEffects/Effects/FX_Materials/Fire/M_JaggedRockFire_MeshEmit_Lit")), FName(TEXT("M_JaggedRockFire_MeshEmit_Lit")), FName(TEXT("/Script/Engine")), FName(TEXT("Material"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/StarterContent/Materials/M_Metal_Steel")), FName(TEXT("M_Metal_Steel")), FName(TEXT("/Script/Engine")), FName(TEXT("Material"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/InfinityBladeEffects/Effects/FX_Materials/ICE/M_JaggedRockIce_MeshEmit")), FName(TEXT("M_JaggedRockIce_MeshEmit")), FName(TEXT("/Script/Engine")), FName(TEXT("Material"))});
-	AssetsToLoad.Add({FName(TEXT("/Game/InfinityBladeEffects/Effects/FX_Materials/Lightning/M_JaggedRockLightning_MeshEmit_Lit_INST")), FName(TEXT("M_JaggedRockLightning_MeshEmit_Lit_INST")), FName(TEXT("/Script/Engine")), FName(TEXT("MaterialInstanceConstant"))});
-	AssetsToLoad.Add({FName(TEXT("/Game/InfinityBladeEffects/Effects/FX_Ability/Heal/P_Heal_Pickup")), FName(TEXT("P_Heal_Pickup")), FName(TEXT("/Script/Engine")), FName(TEXT("ParticleSystem"))});
-	AssetsToLoad.Add({FName(TEXT("/Game/StarterContent/Gobble")), FName(TEXT("Gobble")), FName(TEXT("/Script/Engine")), FName(TEXT("SoundWave"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/InfinityBladeEffects/Effects/FX_Materials/ICE/M_JaggedRockIce_MeshEmit_Blue")), FName(TEXT("M_JaggedRockIce_MeshEmit_Blue")), FName(TEXT("/Script/Engine")), FName(TEXT("Material"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/StarterContent/Audio/Explosion_Cue")), FName(TEXT("Explosion_Cue")), FName(TEXT("/Script/Engine")), FName(TEXT("SoundCue"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/StarterContent/Particles/P_Explosion")), FName(TEXT("P_Explosion")), FName(TEXT("/Script/Engine")), FName(TEXT("ParticleSystem"))});
@@ -408,26 +422,26 @@ void ABallCharacter2_C__pf3208112912::__StaticDependenciesAssets(TArray<FBluepri
 	AssetsToLoad.Add({FName(TEXT("/Game/Fonts/Atmosphere/Atmosphere-Light")), FName(TEXT("Atmosphere-Light")), FName(TEXT("/Script/Engine")), FName(TEXT("Font"))});
 	AssetsToLoad.Add({FName(TEXT("/Engine/EngineFonts/Roboto")), FName(TEXT("Roboto")), FName(TEXT("/Script/Engine")), FName(TEXT("Font"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/StarterContent/Moving")), FName(TEXT("Moving")), FName(TEXT("/Script/Engine")), FName(TEXT("SoundWave"))});
-	AssetsToLoad.Add({FName(TEXT("/Game/StarterContent/Energy_Critical")), FName(TEXT("Energy_Critical")), FName(TEXT("/Script/Engine")), FName(TEXT("SoundWave"))});
-	AssetsToLoad.Add({FName(TEXT("/Game/StarterContent/Level_Cleared_________________Advance_Stage")), FName(TEXT("Level_Cleared_________________Advance_Stage")), FName(TEXT("/Script/Engine")), FName(TEXT("SoundWave"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/StarterContent/Check_Point")), FName(TEXT("Check_Point")), FName(TEXT("/Script/Engine")), FName(TEXT("SoundWave"))});
+	AssetsToLoad.Add({FName(TEXT("/Game/StarterContent/Energy_Critical")), FName(TEXT("Energy_Critical")), FName(TEXT("/Script/Engine")), FName(TEXT("SoundWave"))});
+	AssetsToLoad.Add({FName(TEXT("/Game/InfinityBladeEffects/Effects/FX_Ability/Heal/P_Heal_Pickup")), FName(TEXT("P_Heal_Pickup")), FName(TEXT("/Script/Engine")), FName(TEXT("ParticleSystem"))});
+	AssetsToLoad.Add({FName(TEXT("/Game/StarterContent/Gobble")), FName(TEXT("Gobble")), FName(TEXT("/Script/Engine")), FName(TEXT("SoundWave"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/StarterContent/Scrap")), FName(TEXT("Scrap")), FName(TEXT("/Script/Engine")), FName(TEXT("SoundWave"))});
+	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/EnergyBall")), FName(TEXT("EnergyBall_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/PhysicsBallBP")), FName(TEXT("PhysicsBallBP_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
-	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/MyGameSave")), FName(TEXT("MyGameSave_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/FirstPersonProjectile")), FName(TEXT("FirstPersonProjectile_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/BallCharacter")), FName(TEXT("BallCharacter_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
-	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/EnergyBall")), FName(TEXT("EnergyBall_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/EnemyProjectile")), FName(TEXT("EnemyProjectile_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/CharCamShake")), FName(TEXT("CharCamShake_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/BallCharacter3")), FName(TEXT("BallCharacter3_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/Victory")), FName(TEXT("Victory_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
+	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/MyGameSave")), FName(TEXT("MyGameSave_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/checkpoint")), FName(TEXT("checkpoint_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/HUDisplay")), FName(TEXT("HUDisplay_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/PauseScreen")), FName(TEXT("PauseScreen_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/Options")), FName(TEXT("Options_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/StartScreen")), FName(TEXT("StartScreen_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/About")), FName(TEXT("About_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
-	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/GameOver")), FName(TEXT("GameOver_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
 }
 struct FRegisterHelper__ABallCharacter2_C__pf3208112912
 {
@@ -440,61 +454,131 @@ struct FRegisterHelper__ABallCharacter2_C__pf3208112912
 FRegisterHelper__ABallCharacter2_C__pf3208112912 FRegisterHelper__ABallCharacter2_C__pf3208112912::Instance;
 void ABallCharacter2_C__pf3208112912::bpf__ExecuteUbergraph_BallCharacter2__pf_0(int32 bpp__EntryPoint__pf)
 {
-	check(bpp__EntryPoint__pf == 7);
-	// optimized KCST_UnconditionalGoto
-	b0l__CallFunc_Less_FloatFloat_ReturnValue__pf = UKismetMathLibrary::Less_FloatFloat(bpv__EnemyEnergy__pf, 0.000000);
-	if (!b0l__CallFunc_Less_FloatFloat_ReturnValue__pf)
+	int32 CurrentState = bpp__EntryPoint__pf;
+	do
 	{
-		return; //KCST_GotoReturnIfNot
-	}
-	static TWeakObjectPtr<UProperty> __Local__8{};
-	const UProperty* __Local__7 = __Local__8.Get();
-	if (nullptr == __Local__7)
-	{
-		__Local__7 = (ACharacter::StaticClass())->FindPropertyByName(FName(TEXT("Mesh")));
-		check(__Local__7);
-		__Local__8 = __Local__7;
-	}
-	if(IsValid((*(__Local__7->ContainerPtrToValuePtr<USkeletalMeshComponent* >((this), 0)))))
-	{
-		static TWeakObjectPtr<UProperty> __Local__10{};
-		const UProperty* __Local__9 = __Local__10.Get();
-		if (nullptr == __Local__9)
+		switch( CurrentState )
 		{
-			__Local__9 = (ACharacter::StaticClass())->FindPropertyByName(FName(TEXT("Mesh")));
-			check(__Local__9);
-			__Local__10 = __Local__9;
+		case 1:
+			{
+				b0l__CallFunc_LessEqual_FloatFloat_ReturnValue2__pf = UKismetMathLibrary::LessEqual_FloatFloat(bpv__EnemyEnergy__pf, 200.000000);
+				b0l__CallFunc_GreaterEqual_FloatFloat_ReturnValue2__pf = UKismetMathLibrary::GreaterEqual_FloatFloat(bpv__EnemyEnergy__pf, 100.000000);
+				b0l__CallFunc_BooleanAND_ReturnValue2__pf = UKismetMathLibrary::BooleanAND(b0l__CallFunc_GreaterEqual_FloatFloat_ReturnValue2__pf, b0l__CallFunc_LessEqual_FloatFloat_ReturnValue2__pf);
+				if (!b0l__CallFunc_BooleanAND_ReturnValue2__pf)
+				{
+					CurrentState = 3;
+					break;
+				}
+			}
+		case 2:
+			{
+				if(IsValid(bpv__SpotLight__pf))
+				{
+					bpv__SpotLight__pf->SetLightColor(FLinearColor(0.198794,1.000000,0.000000,1.000000), true);
+				}
+				CurrentState = -1;
+				break;
+			}
+		case 3:
+			{
+				b0l__CallFunc_LessEqual_FloatFloat_ReturnValue__pf = UKismetMathLibrary::LessEqual_FloatFloat(bpv__EnemyEnergy__pf, 99.000000);
+				b0l__CallFunc_GreaterEqual_FloatFloat_ReturnValue__pf = UKismetMathLibrary::GreaterEqual_FloatFloat(bpv__EnemyEnergy__pf, 1.000000);
+				b0l__CallFunc_BooleanAND_ReturnValue__pf = UKismetMathLibrary::BooleanAND(b0l__CallFunc_GreaterEqual_FloatFloat_ReturnValue__pf, b0l__CallFunc_LessEqual_FloatFloat_ReturnValue__pf);
+				if (!b0l__CallFunc_BooleanAND_ReturnValue__pf)
+				{
+					CurrentState = -1;
+					break;
+				}
+			}
+		case 4:
+			{
+				if(IsValid(bpv__SpotLight__pf))
+				{
+					bpv__SpotLight__pf->SetLightColor(FLinearColor(0.941177,0.058824,0.000000,1.000000), true);
+				}
+				CurrentState = -1;
+				break;
+			}
+		case 5:
+			{
+				static TWeakObjectPtr<UProperty> __Local__8{};
+				const UProperty* __Local__7 = __Local__8.Get();
+				if (nullptr == __Local__7)
+				{
+					__Local__7 = (ACharacter::StaticClass())->FindPropertyByName(FName(TEXT("Mesh")));
+					check(__Local__7);
+					__Local__8 = __Local__7;
+				}
+				if(IsValid((*(__Local__7->ContainerPtrToValuePtr<USkeletalMeshComponent* >((this), 0)))))
+				{
+					static TWeakObjectPtr<UProperty> __Local__10{};
+					const UProperty* __Local__9 = __Local__10.Get();
+					if (nullptr == __Local__9)
+					{
+						__Local__9 = (ACharacter::StaticClass())->FindPropertyByName(FName(TEXT("Mesh")));
+						check(__Local__9);
+						__Local__10 = __Local__9;
+					}
+					b0l__CallFunc_K2_GetComponentToWorld_ReturnValue__pf = (*(__Local__9->ContainerPtrToValuePtr<USkeletalMeshComponent* >((this), 0)))->K2_GetComponentToWorld();
+				}
+				b0l__CallFunc_FinishSpawningActor_ReturnValue__pf = CastChecked<AEnergyBall_C__pf3208112912>(UGameplayStatics::FinishSpawningActor(b0l__CallFunc_BeginDeferredActorSpawnFromClass_ReturnValue__pf, /*out*/ b0l__CallFunc_K2_GetComponentToWorld_ReturnValue__pf), ECastCheckedType::NullAllowed);
+			}
+		case 6:
+			{
+				K2_DestroyActor();
+				CurrentState = -1;
+				break;
+			}
+		case 7:
+			{
+				static TWeakObjectPtr<UProperty> __Local__12{};
+				const UProperty* __Local__11 = __Local__12.Get();
+				if (nullptr == __Local__11)
+				{
+					__Local__11 = (ACharacter::StaticClass())->FindPropertyByName(FName(TEXT("Mesh")));
+					check(__Local__11);
+					__Local__12 = __Local__11;
+				}
+				if(IsValid((*(__Local__11->ContainerPtrToValuePtr<USkeletalMeshComponent* >((this), 0)))))
+				{
+					static TWeakObjectPtr<UProperty> __Local__14{};
+					const UProperty* __Local__13 = __Local__14.Get();
+					if (nullptr == __Local__13)
+					{
+						__Local__13 = (ACharacter::StaticClass())->FindPropertyByName(FName(TEXT("Mesh")));
+						check(__Local__13);
+						__Local__14 = __Local__13;
+					}
+					b0l__CallFunc_K2_GetComponentToWorld_ReturnValue__pf = (*(__Local__13->ContainerPtrToValuePtr<USkeletalMeshComponent* >((this), 0)))->K2_GetComponentToWorld();
+				}
+				b0l__CallFunc_BeginDeferredActorSpawnFromClass_ReturnValue__pf = UGameplayStatics::BeginDeferredActorSpawnFromClass(this, AEnergyBall_C__pf3208112912::StaticClass(), /*out*/ b0l__CallFunc_K2_GetComponentToWorld_ReturnValue__pf, ESpawnActorCollisionHandlingMethod::Undefined, nullptr);
+				CurrentState = 5;
+				break;
+			}
+		case 8:
+			{
+				b0l__CallFunc_Less_FloatFloat_ReturnValue__pf = UKismetMathLibrary::Less_FloatFloat(bpv__EnemyEnergy__pf, 0.000000);
+				if (!b0l__CallFunc_Less_FloatFloat_ReturnValue__pf)
+				{
+					CurrentState = 1;
+					break;
+				}
+				CurrentState = 7;
+				break;
+			}
+		case 11:
+			{
+				CurrentState = 8;
+				break;
+			}
+		default:
+			break;
 		}
-		b0l__CallFunc_K2_GetComponentToWorld_ReturnValue__pf = (*(__Local__9->ContainerPtrToValuePtr<USkeletalMeshComponent* >((this), 0)))->K2_GetComponentToWorld();
-	}
-	b0l__CallFunc_BeginDeferredActorSpawnFromClass_ReturnValue__pf = UGameplayStatics::BeginDeferredActorSpawnFromClass(this, AEnergyBall_C__pf3208112912::StaticClass(), /*out*/ b0l__CallFunc_K2_GetComponentToWorld_ReturnValue__pf, ESpawnActorCollisionHandlingMethod::Undefined, nullptr);
-	static TWeakObjectPtr<UProperty> __Local__12{};
-	const UProperty* __Local__11 = __Local__12.Get();
-	if (nullptr == __Local__11)
-	{
-		__Local__11 = (ACharacter::StaticClass())->FindPropertyByName(FName(TEXT("Mesh")));
-		check(__Local__11);
-		__Local__12 = __Local__11;
-	}
-	if(IsValid((*(__Local__11->ContainerPtrToValuePtr<USkeletalMeshComponent* >((this), 0)))))
-	{
-		static TWeakObjectPtr<UProperty> __Local__14{};
-		const UProperty* __Local__13 = __Local__14.Get();
-		if (nullptr == __Local__13)
-		{
-			__Local__13 = (ACharacter::StaticClass())->FindPropertyByName(FName(TEXT("Mesh")));
-			check(__Local__13);
-			__Local__14 = __Local__13;
-		}
-		b0l__CallFunc_K2_GetComponentToWorld_ReturnValue__pf = (*(__Local__13->ContainerPtrToValuePtr<USkeletalMeshComponent* >((this), 0)))->K2_GetComponentToWorld();
-	}
-	b0l__CallFunc_FinishSpawningActor_ReturnValue__pf = CastChecked<AEnergyBall_C__pf3208112912>(UGameplayStatics::FinishSpawningActor(b0l__CallFunc_BeginDeferredActorSpawnFromClass_ReturnValue__pf, /*out*/ b0l__CallFunc_K2_GetComponentToWorld_ReturnValue__pf), ECastCheckedType::NullAllowed);
-	K2_DestroyActor();
-	return; // KCST_GotoReturn
+	} while( CurrentState != -1 );
 }
 void ABallCharacter2_C__pf3208112912::bpf__ExecuteUbergraph_BallCharacter2__pf_1(int32 bpp__EntryPoint__pf)
 {
-	check(bpp__EntryPoint__pf == 15);
+	check(bpp__EntryPoint__pf == 19);
 	// optimized KCST_UnconditionalGoto
 	b0l__K2Node_DynamicCast_AsPhysics_Ball_BP2__pf = Cast<APhysicsBallBP_C__pf3208112912>(b0l__K2Node_Event_OtherActor__pf);
 	b0l__K2Node_DynamicCast_bSuccess3__pf = (b0l__K2Node_DynamicCast_AsPhysics_Ball_BP2__pf != nullptr);
@@ -510,7 +594,7 @@ void ABallCharacter2_C__pf3208112912::bpf__ExecuteUbergraph_BallCharacter2__pf_1
 		b0l__K2Node_DynamicCast_AsPhysics_Ball_BP2__pf->bpv__Energy__pf = b0l__CallFunc_Subtract_FloatFloat_ReturnValue__pf;
 	}
 	// optimized KCST_UnconditionalGoto
-	UGameplayStatics::PlaySound2D(this, CastChecked<USoundBase>(CastChecked<UDynamicClass>(ABallCharacter2_C__pf3208112912::StaticClass())->UsedAssets[22], ECastCheckedType::NullAllowed), 1.000000, 1.000000, 0.000000, nullptr);
+	UGameplayStatics::PlaySound2D(this, CastChecked<USoundBase>(CastChecked<UDynamicClass>(ABallCharacter2_C__pf3208112912::StaticClass())->UsedAssets[21], ECastCheckedType::NullAllowed), 1.000000, 1.000000, 0.000000, nullptr);
 	b0l__K2Node_DynamicCast_AsFirst_Person_Projectile__pf = Cast<AFirstPersonProjectile_C__pf3208112912>(b0l__K2Node_Event_OtherActor__pf);
 	b0l__K2Node_DynamicCast_bSuccess2__pf = (b0l__K2Node_DynamicCast_AsFirst_Person_Projectile__pf != nullptr);
 	if (!b0l__K2Node_DynamicCast_bSuccess2__pf)
@@ -526,7 +610,7 @@ void ABallCharacter2_C__pf3208112912::bpf__ExecuteUbergraph_BallCharacter2__pf_2
 	{
 		switch( CurrentState )
 		{
-		case 9:
+		case 13:
 			{
 				if(IsValid(b0l__K2Node_DynamicCast_AsPhysics_Ball_BP__pf))
 				{
@@ -536,40 +620,40 @@ void ABallCharacter2_C__pf3208112912::bpf__ExecuteUbergraph_BallCharacter2__pf_2
 				CurrentState = -1;
 				break;
 			}
-		case 10:
+		case 14:
 			{
 				b0l__CallFunc_IsValid_ReturnValue__pf = UKismetSystemLibrary::IsValid(b0l__CallFunc_CreateMoveToProxyObject_ReturnValue__pf);
 				if (!b0l__CallFunc_IsValid_ReturnValue__pf)
 				{
-					CurrentState = 9;
+					CurrentState = 13;
 					break;
 				}
 			}
-		case 11:
+		case 15:
 			{
-				b0l__K2Node_CreateDelegate_OutputDelegate2__pf.BindUFunction(this,FName(TEXT("OnSuccess_4E1B9C9A4FB07D9802425581DCBA71F5")));
+				b0l__K2Node_CreateDelegate_OutputDelegate2__pf.BindUFunction(this,FName(TEXT("OnSuccess_B8B8F0B546C90A26CB135AA67F4FC6AF")));
 				if(IsValid(b0l__CallFunc_CreateMoveToProxyObject_ReturnValue__pf))
 				{
 					b0l__CallFunc_CreateMoveToProxyObject_ReturnValue__pf->OnSuccess.Add(b0l__K2Node_CreateDelegate_OutputDelegate2__pf);
 				}
 			}
-		case 12:
+		case 16:
 			{
-				b0l__K2Node_CreateDelegate_OutputDelegate__pf.BindUFunction(this,FName(TEXT("OnFail_4E1B9C9A4FB07D9802425581DCBA71F5")));
+				b0l__K2Node_CreateDelegate_OutputDelegate__pf.BindUFunction(this,FName(TEXT("OnFail_B8B8F0B546C90A26CB135AA67F4FC6AF")));
 				if(IsValid(b0l__CallFunc_CreateMoveToProxyObject_ReturnValue__pf))
 				{
 					b0l__CallFunc_CreateMoveToProxyObject_ReturnValue__pf->OnFail.Add(b0l__K2Node_CreateDelegate_OutputDelegate__pf);
 				}
-				CurrentState = 9;
+				CurrentState = 13;
 				break;
 			}
-		case 14:
+		case 18:
 			{
 				b0l__CallFunc_CreateMoveToProxyObject_ReturnValue__pf = UAIBlueprintHelperLibrary::CreateMoveToProxyObject(this, this, FVector(0.000000,0.000000,0.000000), b0l__K2Node_DynamicCast_AsPhysics_Ball_BP__pf, 5.000000, false);
-				CurrentState = 10;
+				CurrentState = 14;
 				break;
 			}
-		case 16:
+		case 20:
 			{
 				b0l__K2Node_DynamicCast_AsPhysics_Ball_BP__pf = Cast<APhysicsBallBP_C__pf3208112912>(b0l__K2Node_ComponentBoundEvent_Pawn__pf);
 				b0l__K2Node_DynamicCast_bSuccess__pf = (b0l__K2Node_DynamicCast_AsPhysics_Ball_BP__pf != nullptr);
@@ -578,12 +662,12 @@ void ABallCharacter2_C__pf3208112912::bpf__ExecuteUbergraph_BallCharacter2__pf_2
 					CurrentState = -1;
 					break;
 				}
-				CurrentState = 14;
+				CurrentState = 18;
 				break;
 			}
-		case 17:
+		case 21:
 			{
-				CurrentState = 16;
+				CurrentState = 20;
 				break;
 			}
 		default:
@@ -593,14 +677,14 @@ void ABallCharacter2_C__pf3208112912::bpf__ExecuteUbergraph_BallCharacter2__pf_2
 }
 void ABallCharacter2_C__pf3208112912::bpf__ExecuteUbergraph_BallCharacter2__pf_3(int32 bpp__EntryPoint__pf)
 {
-	check(bpp__EntryPoint__pf == 20);
+	check(bpp__EntryPoint__pf == 24);
 	// optimized KCST_UnconditionalGoto
 	b0l__Temp_byte_Variable__pf = b0l__K2Node_CustomEvent_MovementResult__pf;
 	return; // KCST_GotoReturn
 }
 void ABallCharacter2_C__pf3208112912::bpf__ExecuteUbergraph_BallCharacter2__pf_4(int32 bpp__EntryPoint__pf)
 {
-	check(bpp__EntryPoint__pf == 21);
+	check(bpp__EntryPoint__pf == 25);
 	// optimized KCST_UnconditionalGoto
 	b0l__Temp_byte_Variable__pf = b0l__K2Node_CustomEvent_MovementResult2__pf;
 	return; // KCST_GotoReturn
@@ -608,27 +692,27 @@ void ABallCharacter2_C__pf3208112912::bpf__ExecuteUbergraph_BallCharacter2__pf_4
 void ABallCharacter2_C__pf3208112912::bpf__ReceiveTick__pf(float bpp__DeltaSeconds__pf)
 {
 	b0l__K2Node_Event_DeltaSeconds__pf = bpp__DeltaSeconds__pf;
-	bpf__ExecuteUbergraph_BallCharacter2__pf_0(7);
+	bpf__ExecuteUbergraph_BallCharacter2__pf_0(11);
 }
 void ABallCharacter2_C__pf3208112912::bpf__ReceiveActorBeginOverlap__pf(AActor* bpp__OtherActor__pf)
 {
 	b0l__K2Node_Event_OtherActor__pf = bpp__OtherActor__pf;
-	bpf__ExecuteUbergraph_BallCharacter2__pf_1(15);
+	bpf__ExecuteUbergraph_BallCharacter2__pf_1(19);
 }
 void ABallCharacter2_C__pf3208112912::bpf__BndEvt__PawnSensing_K2Node_ComponentBoundEvent_0_SeePawnDelegate__DelegateSignature__pf(APawn* bpp__Pawn__pf)
 {
 	b0l__K2Node_ComponentBoundEvent_Pawn__pf = bpp__Pawn__pf;
-	bpf__ExecuteUbergraph_BallCharacter2__pf_2(17);
+	bpf__ExecuteUbergraph_BallCharacter2__pf_2(21);
 }
-void ABallCharacter2_C__pf3208112912::bpf__OnSuccess_4E1B9C9A4FB07D9802425581DCBA71F5__pf(EPathFollowingResult::Type bpp__MovementResult__pf)
+void ABallCharacter2_C__pf3208112912::bpf__OnSuccess_B8B8F0B546C90A26CB135AA67F4FC6AF__pf(EPathFollowingResult::Type bpp__MovementResult__pf)
 {
 	b0l__K2Node_CustomEvent_MovementResult__pf = bpp__MovementResult__pf;
-	bpf__ExecuteUbergraph_BallCharacter2__pf_3(20);
+	bpf__ExecuteUbergraph_BallCharacter2__pf_3(24);
 }
-void ABallCharacter2_C__pf3208112912::bpf__OnFail_4E1B9C9A4FB07D9802425581DCBA71F5__pf(EPathFollowingResult::Type bpp__MovementResult__pf)
+void ABallCharacter2_C__pf3208112912::bpf__OnFail_B8B8F0B546C90A26CB135AA67F4FC6AF__pf(EPathFollowingResult::Type bpp__MovementResult__pf)
 {
 	b0l__K2Node_CustomEvent_MovementResult2__pf = bpp__MovementResult__pf;
-	bpf__ExecuteUbergraph_BallCharacter2__pf_4(21);
+	bpf__ExecuteUbergraph_BallCharacter2__pf_4(25);
 }
 void ABallCharacter2_C__pf3208112912::bpf__UserConstructionScript__pf()
 {

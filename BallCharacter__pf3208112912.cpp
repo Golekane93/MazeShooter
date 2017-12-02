@@ -12,6 +12,7 @@
 #include "Runtime/Engine/Classes/AI/Navigation/NavAreas/NavArea_Obstacle.h"
 #include "Runtime/Engine/Classes/AI/Navigation/NavAreas/NavArea.h"
 #include "Runtime/Engine/Classes/AI/Navigation/NavigationTypes.h"
+#include "Runtime/Engine/Classes/Components/SpotLightComponent.h"
 #include "Runtime/Engine/Classes/Components/SceneComponent.h"
 #include "BallCharacter__pf3208112912.h"
 #include "Runtime/Engine/Classes/Components/MeshComponent.h"
@@ -185,6 +186,10 @@
 #include "Runtime/Engine/Classes/Components/ChildActorComponent.h"
 #include "Runtime/Engine/Classes/EdGraph/EdGraphPin.h"
 #include "Runtime/Engine/Classes/AI/Navigation/NavRelevantInterface.h"
+#include "Runtime/Engine/Classes/Components/PointLightComponent.h"
+#include "Runtime/Engine/Classes/Components/LightComponent.h"
+#include "Runtime/Engine/Classes/Components/LightComponentBase.h"
+#include "Runtime/Engine/Classes/Engine/TextureLightProfile.h"
 #include "EnergyBall__pf3208112912.h"
 #include "EnemyProjectile__pf3208112912.h"
 #include "Runtime/AIModule/Classes/Blueprint/AIAsyncTaskBlueprintProxy.h"
@@ -201,19 +206,18 @@
 #include "Runtime/Engine/Classes/Kismet/KismetSystemLibrary.h"
 #include "Runtime/AIModule/Classes/Blueprint/AIBlueprintHelperLibrary.h"
 #include "Runtime/Engine/Classes/Engine/BlueprintGeneratedClass.h"
-#include "MyGameSave__pf3208112912.h"
 #include "FirstPersonProjectile__pf3208112912.h"
 #include "BallCharacter2__pf3208112912.h"
 #include "BallCharacter3__pf3208112912.h"
 #include "CharCamShake__pf895046141.h"
 #include "Victory__pf3208112912.h"
+#include "MyGameSave__pf3208112912.h"
 #include "checkpoint__pf3208112912.h"
 #include "HUDisplay__pf3208112912.h"
 #include "PauseScreen__pf3208112912.h"
 #include "Options__pf3208112912.h"
 #include "StartScreen__pf3208112912.h"
 #include "About__pf3208112912.h"
-#include "GameOver__pf3208112912.h"
 void ABallCharacter_C__pf3208112912::__CustomDynamicClassInitialization(UDynamicClass* InDynamicClass)
 {
 	ensure(0 == InDynamicClass->ReferencedConvertedFields.Num());
@@ -228,8 +232,6 @@ void ABallCharacter_C__pf3208112912::__CustomDynamicClassInitialization(UDynamic
 	InDynamicClass->ReferencedConvertedFields.Add(Z_Construct_UClass_AEnergyBall_C__pf3208112912());
 	extern UClass* Z_Construct_UClass_APhysicsBallBP_C__pf3208112912();
 	InDynamicClass->ReferencedConvertedFields.Add(Z_Construct_UClass_APhysicsBallBP_C__pf3208112912());
-	extern UClass* Z_Construct_UClass_UMyGameSave_C__pf3208112912();
-	InDynamicClass->ReferencedConvertedFields.Add(Z_Construct_UClass_UMyGameSave_C__pf3208112912());
 	extern UClass* Z_Construct_UClass_AFirstPersonProjectile_C__pf3208112912();
 	InDynamicClass->ReferencedConvertedFields.Add(Z_Construct_UClass_AFirstPersonProjectile_C__pf3208112912());
 	extern UClass* Z_Construct_UClass_ABallCharacter2_C__pf3208112912();
@@ -242,6 +244,8 @@ void ABallCharacter_C__pf3208112912::__CustomDynamicClassInitialization(UDynamic
 	InDynamicClass->ReferencedConvertedFields.Add(Z_Construct_UClass_UCharCamShake_C__pf895046141());
 	extern UClass* Z_Construct_UClass_UVictory_C__pf3208112912();
 	InDynamicClass->ReferencedConvertedFields.Add(Z_Construct_UClass_UVictory_C__pf3208112912());
+	extern UClass* Z_Construct_UClass_UMyGameSave_C__pf3208112912();
+	InDynamicClass->ReferencedConvertedFields.Add(Z_Construct_UClass_UMyGameSave_C__pf3208112912());
 	extern UClass* Z_Construct_UClass_Ucheckpoint_C__pf3208112912();
 	InDynamicClass->ReferencedConvertedFields.Add(Z_Construct_UClass_Ucheckpoint_C__pf3208112912());
 	extern UClass* Z_Construct_UClass_UHUDisplay_C__pf3208112912();
@@ -254,8 +258,6 @@ void ABallCharacter_C__pf3208112912::__CustomDynamicClassInitialization(UDynamic
 	InDynamicClass->ReferencedConvertedFields.Add(Z_Construct_UClass_UStartScreen_C__pf3208112912());
 	extern UClass* Z_Construct_UClass_UAbout_C__pf3208112912();
 	InDynamicClass->ReferencedConvertedFields.Add(Z_Construct_UClass_UAbout_C__pf3208112912());
-	extern UClass* Z_Construct_UClass_UGameOver_C__pf3208112912();
-	InDynamicClass->ReferencedConvertedFields.Add(Z_Construct_UClass_UGameOver_C__pf3208112912());
 	// List of all referenced assets
 	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Engine/BasicShapes/Sphere.Sphere")));
 	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Game/StarterContent/Materials/M_Metal_Steel.M_Metal_Steel")));
@@ -275,9 +277,8 @@ void ABallCharacter_C__pf3208112912::__CustomDynamicClassInitialization(UDynamic
 	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Game/Fonts/Atmosphere/Atmosphere-Light.Atmosphere-Light")));
 	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Engine/EngineFonts/Roboto.Roboto")));
 	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Game/StarterContent/Moving.Moving")));
-	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Game/StarterContent/Energy_Critical.Energy_Critical")));
-	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Game/StarterContent/Level_Cleared_________________Advance_Stage.Level_Cleared_________________Advance_Stage")));
 	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Game/StarterContent/Check_Point.Check_Point")));
+	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Game/StarterContent/Energy_Critical.Energy_Critical")));
 	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Game/InfinityBladeEffects/Effects/FX_Ability/Heal/P_Heal_Pickup.P_Heal_Pickup")));
 	InDynamicClass->UsedAssets.Add(LoadObject<UObject>(nullptr, TEXT("/Game/StarterContent/Gobble.Gobble")));
 	auto __Local__0 = NewObject<UComponentDelegateBinding>(InDynamicClass, UComponentDelegateBinding::StaticClass(), TEXT("ComponentDelegateBinding_3"));
@@ -303,49 +304,29 @@ ABallCharacter_C__pf3208112912::ABallCharacter_C__pf3208112912(const FObjectInit
 	bpv__PawnSensing__pf = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensing"));
 	bpv__Sphere1__pf = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere1"));
 	bpv__Sphere2__pf = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Sphere2"));
+	bpv__SpotLight__pf = CreateDefaultSubobject<USpotLightComponent>(TEXT("SpotLight"));
 	bpv__Sphere__pf->CreationMethod = EComponentCreationMethod::Native;
 	bpv__Sphere__pf->AttachToComponent(__Local__1, FAttachmentTransformRules::KeepRelativeTransform );
 	bpv__Sphere__pf->StaticMesh = CastChecked<UStaticMesh>(CastChecked<UDynamicClass>(ABallCharacter_C__pf3208112912::StaticClass())->UsedAssets[0], ECastCheckedType::NullAllowed);
 	bpv__Sphere__pf->OverrideMaterials = TArray<UMaterialInterface*> ();
 	bpv__Sphere__pf->OverrideMaterials.Reserve(1);
 	bpv__Sphere__pf->OverrideMaterials.Add(CastChecked<UMaterialInterface>(CastChecked<UDynamicClass>(ABallCharacter_C__pf3208112912::StaticClass())->UsedAssets[1], ECastCheckedType::NullAllowed));
-	static TWeakObjectPtr<UProperty> __Local__5{};
-	const UProperty* __Local__4 = __Local__5.Get();
-	if (nullptr == __Local__4)
-	{
-		__Local__4 = (FBodyInstance::StaticStruct())->FindPropertyByName(FName(TEXT("CollisionProfileName")));
-		check(__Local__4);
-		__Local__5 = __Local__4;
-	}
-	auto& __Local__6 = (*(__Local__4->ContainerPtrToValuePtr<FName >(&(bpv__Sphere__pf->BodyInstance), 0)));
-	__Local__6 = FName(TEXT("PhysicsActor"));
-	bpv__Sphere__pf->BodyInstance.bSimulatePhysics = true;
-	static TWeakObjectPtr<UProperty> __Local__8{};
-	const UProperty* __Local__7 = __Local__8.Get();
-	if (nullptr == __Local__7)
-	{
-		__Local__7 = (FBodyInstance::StaticStruct())->FindPropertyByName(FName(TEXT("ObjectType")));
-		check(__Local__7);
-		__Local__8 = __Local__7;
-	}
-	auto& __Local__9 = (*(__Local__7->ContainerPtrToValuePtr<TEnumAsByte<ECollisionChannel> >(&(bpv__Sphere__pf->BodyInstance), 0)));
-	__Local__9 = ECollisionChannel::ECC_PhysicsBody;
 	bpv__Sphere__pf->RelativeLocation = FVector(0.000000, 0.000000, -30.000000);
 	if(!bpv__Sphere__pf->IsTemplate())
 	{
 		bpv__Sphere__pf->BodyInstance.FixupData(bpv__Sphere__pf);
 	}
 	bpv__PawnSensing__pf->CreationMethod = EComponentCreationMethod::Native;
-	static TWeakObjectPtr<UProperty> __Local__11{};
-	const UProperty* __Local__10 = __Local__11.Get();
-	if (nullptr == __Local__10)
+	static TWeakObjectPtr<UProperty> __Local__5{};
+	const UProperty* __Local__4 = __Local__5.Get();
+	if (nullptr == __Local__4)
 	{
-		__Local__10 = (UPawnSensingComponent::StaticClass())->FindPropertyByName(FName(TEXT("PeripheralVisionAngle")));
-		check(__Local__10);
-		__Local__11 = __Local__10;
+		__Local__4 = (UPawnSensingComponent::StaticClass())->FindPropertyByName(FName(TEXT("PeripheralVisionAngle")));
+		check(__Local__4);
+		__Local__5 = __Local__4;
 	}
-	auto& __Local__12 = (*(__Local__10->ContainerPtrToValuePtr<float >((bpv__PawnSensing__pf), 0)));
-	__Local__12 = 180.000000f;
+	auto& __Local__6 = (*(__Local__4->ContainerPtrToValuePtr<float >((bpv__PawnSensing__pf), 0)));
+	__Local__6 = 180.000000f;
 	bpv__Sphere1__pf->CreationMethod = EComponentCreationMethod::Native;
 	bpv__Sphere1__pf->AttachToComponent(__Local__1, FAttachmentTransformRules::KeepRelativeTransform );
 	bpv__Sphere1__pf->RelativeLocation = FVector(0.000000, 60.000000, 10.000000);
@@ -366,7 +347,18 @@ ABallCharacter_C__pf3208112912::ABallCharacter_C__pf3208112912(const FObjectInit
 	{
 		bpv__Sphere2__pf->BodyInstance.FixupData(bpv__Sphere2__pf);
 	}
-	bpv__EnemyEnergy__pf = 120.000000f;
+	bpv__SpotLight__pf->CreationMethod = EComponentCreationMethod::Native;
+	bpv__SpotLight__pf->AttachToComponent(__Local__1, FAttachmentTransformRules::KeepRelativeTransform );
+	bpv__SpotLight__pf->OuterConeAngle = 26.605495f;
+	bpv__SpotLight__pf->AttenuationRadius = 137.726669f;
+	bpv__SpotLight__pf->bUseTemperature = true;
+	bpv__SpotLight__pf->LightGuid = FGuid(0x3BDA436F, 0x4B45E1DD, 0x5D05F8BD, 0x8801F8FB);
+	bpv__SpotLight__pf->Intensity = 100000.000000f;
+	bpv__SpotLight__pf->LightColor = FColor(7, 255, 0, 255);
+	bpv__SpotLight__pf->bPrecomputedLightingIsValid = false;
+	bpv__SpotLight__pf->RelativeLocation = FVector(0.000000, 0.000000, 90.000000);
+	bpv__SpotLight__pf->RelativeRotation = FRotator(-90.000000, 0.000437, -179.999939);
+	bpv__EnemyEnergy__pf = 600.000000f;
 	bpv__DistanceFromEnemy__pf = 0.000000f;
 	bUseControllerRotationPitch = true;
 	bUseControllerRotationRoll = true;
@@ -391,6 +383,10 @@ void ABallCharacter_C__pf3208112912::PostLoadSubobjects(FObjectInstancingGraph* 
 	{
 		bpv__Sphere2__pf->CreationMethod = EComponentCreationMethod::Native;
 	}
+	if(bpv__SpotLight__pf)
+	{
+		bpv__SpotLight__pf->CreationMethod = EComponentCreationMethod::Native;
+	}
 }
 void ABallCharacter_C__pf3208112912::__StaticDependenciesAssets(TArray<FBlueprintDependencyData>& AssetsToLoad)
 {
@@ -412,27 +408,25 @@ void ABallCharacter_C__pf3208112912::__StaticDependenciesAssets(TArray<FBlueprin
 	AssetsToLoad.Add({FName(TEXT("/Game/Fonts/Atmosphere/Atmosphere-Light")), FName(TEXT("Atmosphere-Light")), FName(TEXT("/Script/Engine")), FName(TEXT("Font"))});
 	AssetsToLoad.Add({FName(TEXT("/Engine/EngineFonts/Roboto")), FName(TEXT("Roboto")), FName(TEXT("/Script/Engine")), FName(TEXT("Font"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/StarterContent/Moving")), FName(TEXT("Moving")), FName(TEXT("/Script/Engine")), FName(TEXT("SoundWave"))});
-	AssetsToLoad.Add({FName(TEXT("/Game/StarterContent/Energy_Critical")), FName(TEXT("Energy_Critical")), FName(TEXT("/Script/Engine")), FName(TEXT("SoundWave"))});
-	AssetsToLoad.Add({FName(TEXT("/Game/StarterContent/Level_Cleared_________________Advance_Stage")), FName(TEXT("Level_Cleared_________________Advance_Stage")), FName(TEXT("/Script/Engine")), FName(TEXT("SoundWave"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/StarterContent/Check_Point")), FName(TEXT("Check_Point")), FName(TEXT("/Script/Engine")), FName(TEXT("SoundWave"))});
+	AssetsToLoad.Add({FName(TEXT("/Game/StarterContent/Energy_Critical")), FName(TEXT("Energy_Critical")), FName(TEXT("/Script/Engine")), FName(TEXT("SoundWave"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/InfinityBladeEffects/Effects/FX_Ability/Heal/P_Heal_Pickup")), FName(TEXT("P_Heal_Pickup")), FName(TEXT("/Script/Engine")), FName(TEXT("ParticleSystem"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/StarterContent/Gobble")), FName(TEXT("Gobble")), FName(TEXT("/Script/Engine")), FName(TEXT("SoundWave"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/EnergyBall")), FName(TEXT("EnergyBall_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/PhysicsBallBP")), FName(TEXT("PhysicsBallBP_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
-	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/MyGameSave")), FName(TEXT("MyGameSave_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/FirstPersonProjectile")), FName(TEXT("FirstPersonProjectile_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/BallCharacter2")), FName(TEXT("BallCharacter2_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/BallCharacter3")), FName(TEXT("BallCharacter3_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/EnemyProjectile")), FName(TEXT("EnemyProjectile_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/CharCamShake")), FName(TEXT("CharCamShake_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/Victory")), FName(TEXT("Victory_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
+	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/MyGameSave")), FName(TEXT("MyGameSave_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/checkpoint")), FName(TEXT("checkpoint_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/HUDisplay")), FName(TEXT("HUDisplay_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/PauseScreen")), FName(TEXT("PauseScreen_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/Options")), FName(TEXT("Options_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/StartScreen")), FName(TEXT("StartScreen_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
 	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/About")), FName(TEXT("About_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
-	AssetsToLoad.Add({FName(TEXT("/Game/RollingBP/Blueprints/GameOver")), FName(TEXT("GameOver_C")), FName(TEXT("/Script/CoreUObject")), FName(TEXT("DynamicClass"))});
 }
 struct FRegisterHelper__ABallCharacter_C__pf3208112912
 {
@@ -445,59 +439,147 @@ struct FRegisterHelper__ABallCharacter_C__pf3208112912
 FRegisterHelper__ABallCharacter_C__pf3208112912 FRegisterHelper__ABallCharacter_C__pf3208112912::Instance;
 void ABallCharacter_C__pf3208112912::bpf__ExecuteUbergraph_BallCharacter__pf_0(int32 bpp__EntryPoint__pf)
 {
-	check(bpp__EntryPoint__pf == 17);
-	// optimized KCST_UnconditionalGoto
-	b0l__CallFunc_Less_FloatFloat_ReturnValue__pf = UKismetMathLibrary::Less_FloatFloat(bpv__EnemyEnergy__pf, 0.000000);
-	if (!b0l__CallFunc_Less_FloatFloat_ReturnValue__pf)
+	int32 CurrentState = bpp__EntryPoint__pf;
+	do
 	{
-		return; //KCST_GotoReturnIfNot
-	}
-	// optimized KCST_UnconditionalGoto
-	static TWeakObjectPtr<UProperty> __Local__14{};
-	const UProperty* __Local__13 = __Local__14.Get();
-	if (nullptr == __Local__13)
-	{
-		__Local__13 = (ACharacter::StaticClass())->FindPropertyByName(FName(TEXT("Mesh")));
-		check(__Local__13);
-		__Local__14 = __Local__13;
-	}
-	if(IsValid((*(__Local__13->ContainerPtrToValuePtr<USkeletalMeshComponent* >((this), 0)))))
-	{
-		static TWeakObjectPtr<UProperty> __Local__16{};
-		const UProperty* __Local__15 = __Local__16.Get();
-		if (nullptr == __Local__15)
+		switch( CurrentState )
 		{
-			__Local__15 = (ACharacter::StaticClass())->FindPropertyByName(FName(TEXT("Mesh")));
-			check(__Local__15);
-			__Local__16 = __Local__15;
+		case 1:
+			{
+				static TWeakObjectPtr<UProperty> __Local__8{};
+				const UProperty* __Local__7 = __Local__8.Get();
+				if (nullptr == __Local__7)
+				{
+					__Local__7 = (ACharacter::StaticClass())->FindPropertyByName(FName(TEXT("Mesh")));
+					check(__Local__7);
+					__Local__8 = __Local__7;
+				}
+				if(IsValid((*(__Local__7->ContainerPtrToValuePtr<USkeletalMeshComponent* >((this), 0)))))
+				{
+					static TWeakObjectPtr<UProperty> __Local__10{};
+					const UProperty* __Local__9 = __Local__10.Get();
+					if (nullptr == __Local__9)
+					{
+						__Local__9 = (ACharacter::StaticClass())->FindPropertyByName(FName(TEXT("Mesh")));
+						check(__Local__9);
+						__Local__10 = __Local__9;
+					}
+					b0l__CallFunc_K2_GetComponentToWorld_ReturnValue2__pf = (*(__Local__9->ContainerPtrToValuePtr<USkeletalMeshComponent* >((this), 0)))->K2_GetComponentToWorld();
+				}
+				b0l__CallFunc_FinishSpawningActor_ReturnValue2__pf = CastChecked<AEnergyBall_C__pf3208112912>(UGameplayStatics::FinishSpawningActor(b0l__CallFunc_BeginDeferredActorSpawnFromClass_ReturnValue2__pf, /*out*/ b0l__CallFunc_K2_GetComponentToWorld_ReturnValue2__pf), ECastCheckedType::NullAllowed);
+			}
+		case 2:
+			{
+				K2_DestroyActor();
+				CurrentState = -1;
+				break;
+			}
+		case 3:
+			{
+				static TWeakObjectPtr<UProperty> __Local__12{};
+				const UProperty* __Local__11 = __Local__12.Get();
+				if (nullptr == __Local__11)
+				{
+					__Local__11 = (ACharacter::StaticClass())->FindPropertyByName(FName(TEXT("Mesh")));
+					check(__Local__11);
+					__Local__12 = __Local__11;
+				}
+				if(IsValid((*(__Local__11->ContainerPtrToValuePtr<USkeletalMeshComponent* >((this), 0)))))
+				{
+					static TWeakObjectPtr<UProperty> __Local__14{};
+					const UProperty* __Local__13 = __Local__14.Get();
+					if (nullptr == __Local__13)
+					{
+						__Local__13 = (ACharacter::StaticClass())->FindPropertyByName(FName(TEXT("Mesh")));
+						check(__Local__13);
+						__Local__14 = __Local__13;
+					}
+					b0l__CallFunc_K2_GetComponentToWorld_ReturnValue2__pf = (*(__Local__13->ContainerPtrToValuePtr<USkeletalMeshComponent* >((this), 0)))->K2_GetComponentToWorld();
+				}
+				b0l__CallFunc_BeginDeferredActorSpawnFromClass_ReturnValue2__pf = UGameplayStatics::BeginDeferredActorSpawnFromClass(this, AEnergyBall_C__pf3208112912::StaticClass(), /*out*/ b0l__CallFunc_K2_GetComponentToWorld_ReturnValue2__pf, ESpawnActorCollisionHandlingMethod::Undefined, nullptr);
+				CurrentState = 1;
+				break;
+			}
+		case 4:
+			{
+				CurrentState = 5;
+				break;
+			}
+		case 5:
+			{
+				b0l__CallFunc_Less_FloatFloat_ReturnValue__pf = UKismetMathLibrary::Less_FloatFloat(bpv__EnemyEnergy__pf, 0.000000);
+				if (!b0l__CallFunc_Less_FloatFloat_ReturnValue__pf)
+				{
+					CurrentState = 6;
+					break;
+				}
+				CurrentState = 3;
+				break;
+			}
+		case 6:
+			{
+				b0l__CallFunc_LessEqual_FloatFloat_ReturnValue3__pf = UKismetMathLibrary::LessEqual_FloatFloat(bpv__EnemyEnergy__pf, 600.000000);
+				b0l__CallFunc_GreaterEqual_FloatFloat_ReturnValue4__pf = UKismetMathLibrary::GreaterEqual_FloatFloat(bpv__EnemyEnergy__pf, 800.000000);
+				b0l__CallFunc_BooleanAND_ReturnValue3__pf = UKismetMathLibrary::BooleanAND(b0l__CallFunc_GreaterEqual_FloatFloat_ReturnValue4__pf, b0l__CallFunc_LessEqual_FloatFloat_ReturnValue3__pf);
+				if (!b0l__CallFunc_BooleanAND_ReturnValue3__pf)
+				{
+					CurrentState = 8;
+					break;
+				}
+			}
+		case 7:
+			{
+				if(IsValid(bpv__SpotLight__pf))
+				{
+					bpv__SpotLight__pf->SetLightColor(FLinearColor(0.198794,1.000000,0.000000,1.000000), true);
+				}
+				CurrentState = -1;
+				break;
+			}
+		case 8:
+			{
+				b0l__CallFunc_LessEqual_FloatFloat_ReturnValue2__pf = UKismetMathLibrary::LessEqual_FloatFloat(bpv__EnemyEnergy__pf, 399.000000);
+				b0l__CallFunc_GreaterEqual_FloatFloat_ReturnValue3__pf = UKismetMathLibrary::GreaterEqual_FloatFloat(bpv__EnemyEnergy__pf, 200.000000);
+				b0l__CallFunc_BooleanAND_ReturnValue2__pf = UKismetMathLibrary::BooleanAND(b0l__CallFunc_GreaterEqual_FloatFloat_ReturnValue3__pf, b0l__CallFunc_LessEqual_FloatFloat_ReturnValue2__pf);
+				if (!b0l__CallFunc_BooleanAND_ReturnValue2__pf)
+				{
+					CurrentState = 10;
+					break;
+				}
+			}
+		case 9:
+			{
+				if(IsValid(bpv__SpotLight__pf))
+				{
+					bpv__SpotLight__pf->SetLightColor(FLinearColor(1.000000,0.834394,0.000000,1.000000), true);
+				}
+				CurrentState = -1;
+				break;
+			}
+		case 10:
+			{
+				b0l__CallFunc_GreaterEqual_FloatFloat_ReturnValue2__pf = UKismetMathLibrary::GreaterEqual_FloatFloat(bpv__EnemyEnergy__pf, 1.000000);
+				b0l__CallFunc_LessEqual_FloatFloat_ReturnValue__pf = UKismetMathLibrary::LessEqual_FloatFloat(bpv__EnemyEnergy__pf, 199.000000);
+				b0l__CallFunc_BooleanAND_ReturnValue__pf = UKismetMathLibrary::BooleanAND(b0l__CallFunc_GreaterEqual_FloatFloat_ReturnValue2__pf, b0l__CallFunc_LessEqual_FloatFloat_ReturnValue__pf);
+				if (!b0l__CallFunc_BooleanAND_ReturnValue__pf)
+				{
+					CurrentState = -1;
+					break;
+				}
+			}
+		case 11:
+			{
+				if(IsValid(bpv__SpotLight__pf))
+				{
+					bpv__SpotLight__pf->SetLightColor(FLinearColor(0.940000,0.062344,0.000000,1.000000), true);
+				}
+				CurrentState = -1;
+				break;
+			}
+		default:
+			break;
 		}
-		b0l__CallFunc_K2_GetComponentToWorld_ReturnValue2__pf = (*(__Local__15->ContainerPtrToValuePtr<USkeletalMeshComponent* >((this), 0)))->K2_GetComponentToWorld();
-	}
-	b0l__CallFunc_BeginDeferredActorSpawnFromClass_ReturnValue2__pf = UGameplayStatics::BeginDeferredActorSpawnFromClass(this, AEnergyBall_C__pf3208112912::StaticClass(), /*out*/ b0l__CallFunc_K2_GetComponentToWorld_ReturnValue2__pf, ESpawnActorCollisionHandlingMethod::Undefined, nullptr);
-	// optimized KCST_UnconditionalGoto
-	static TWeakObjectPtr<UProperty> __Local__18{};
-	const UProperty* __Local__17 = __Local__18.Get();
-	if (nullptr == __Local__17)
-	{
-		__Local__17 = (ACharacter::StaticClass())->FindPropertyByName(FName(TEXT("Mesh")));
-		check(__Local__17);
-		__Local__18 = __Local__17;
-	}
-	if(IsValid((*(__Local__17->ContainerPtrToValuePtr<USkeletalMeshComponent* >((this), 0)))))
-	{
-		static TWeakObjectPtr<UProperty> __Local__20{};
-		const UProperty* __Local__19 = __Local__20.Get();
-		if (nullptr == __Local__19)
-		{
-			__Local__19 = (ACharacter::StaticClass())->FindPropertyByName(FName(TEXT("Mesh")));
-			check(__Local__19);
-			__Local__20 = __Local__19;
-		}
-		b0l__CallFunc_K2_GetComponentToWorld_ReturnValue2__pf = (*(__Local__19->ContainerPtrToValuePtr<USkeletalMeshComponent* >((this), 0)))->K2_GetComponentToWorld();
-	}
-	b0l__CallFunc_FinishSpawningActor_ReturnValue2__pf = CastChecked<AEnergyBall_C__pf3208112912>(UGameplayStatics::FinishSpawningActor(b0l__CallFunc_BeginDeferredActorSpawnFromClass_ReturnValue2__pf, /*out*/ b0l__CallFunc_K2_GetComponentToWorld_ReturnValue2__pf), ECastCheckedType::NullAllowed);
-	K2_DestroyActor();
-	return; // KCST_GotoReturn
+	} while( CurrentState != -1 );
 }
 void ABallCharacter_C__pf3208112912::bpf__ExecuteUbergraph_BallCharacter__pf_1(int32 bpp__EntryPoint__pf)
 {
@@ -506,7 +588,7 @@ void ABallCharacter_C__pf3208112912::bpf__ExecuteUbergraph_BallCharacter__pf_1(i
 	{
 		switch( CurrentState )
 		{
-		case 4:
+		case 12:
 			{
 				if(IsValid(bpv__Sphere1__pf))
 				{
@@ -516,17 +598,17 @@ void ABallCharacter_C__pf3208112912::bpf__ExecuteUbergraph_BallCharacter__pf_1(i
 				CurrentState = -1;
 				break;
 			}
-		case 5:
+		case 13:
 			{
 				if(IsValid(bpv__Sphere1__pf))
 				{
 					b0l__CallFunc_K2_GetComponentToWorld_ReturnValue__pf = bpv__Sphere1__pf->K2_GetComponentToWorld();
 				}
 				b0l__CallFunc_BeginDeferredActorSpawnFromClass_ReturnValue__pf = UGameplayStatics::BeginDeferredActorSpawnFromClass(this, AEnemyProjectile_C__pf3208112912::StaticClass(), /*out*/ b0l__CallFunc_K2_GetComponentToWorld_ReturnValue__pf, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding, nullptr);
-				CurrentState = 4;
+				CurrentState = 12;
 				break;
 			}
-		case 6:
+		case 14:
 			{
 				b0l__CallFunc_GreaterEqual_FloatFloat_ReturnValue__pf = UKismetMathLibrary::GreaterEqual_FloatFloat(bpv__DistanceFromEnemy__pf, 15.000000);
 				if (!b0l__CallFunc_GreaterEqual_FloatFloat_ReturnValue__pf)
@@ -534,53 +616,53 @@ void ABallCharacter_C__pf3208112912::bpf__ExecuteUbergraph_BallCharacter__pf_1(i
 					CurrentState = -1;
 					break;
 				}
-				CurrentState = 5;
+				CurrentState = 13;
 				break;
 			}
-		case 7:
+		case 15:
 			{
-				b0l__K2Node_CreateDelegate_OutputDelegate2__pf.BindUFunction(this,FName(TEXT("OnFail_532655CE45AF1C7A41A6F8B8FB1362E7")));
+				b0l__K2Node_CreateDelegate_OutputDelegate2__pf.BindUFunction(this,FName(TEXT("OnFail_2DCD53F3405B5E39758DD8AB796FA0A2")));
 				if(IsValid(b0l__CallFunc_CreateMoveToProxyObject_ReturnValue__pf))
 				{
 					b0l__CallFunc_CreateMoveToProxyObject_ReturnValue__pf->OnFail.Add(b0l__K2Node_CreateDelegate_OutputDelegate2__pf);
 				}
 			}
-		case 8:
+		case 16:
 			{
 				if(IsValid(b0l__K2Node_DynamicCast_AsPhysics_Ball_BP__pf))
 				{
 					b0l__CallFunc_GetDistanceTo_ReturnValue__pf = b0l__K2Node_DynamicCast_AsPhysics_Ball_BP__pf->GetDistanceTo(this);
 				}
 				bpv__DistanceFromEnemy__pf = b0l__CallFunc_GetDistanceTo_ReturnValue__pf;
-				CurrentState = 6;
+				CurrentState = 14;
 				break;
 			}
-		case 9:
+		case 17:
 			{
 				b0l__CallFunc_IsValid_ReturnValue__pf = UKismetSystemLibrary::IsValid(b0l__CallFunc_CreateMoveToProxyObject_ReturnValue__pf);
 				if (!b0l__CallFunc_IsValid_ReturnValue__pf)
 				{
-					CurrentState = 8;
+					CurrentState = 16;
 					break;
 				}
 			}
-		case 10:
+		case 18:
 			{
-				b0l__K2Node_CreateDelegate_OutputDelegate__pf.BindUFunction(this,FName(TEXT("OnSuccess_532655CE45AF1C7A41A6F8B8FB1362E7")));
+				b0l__K2Node_CreateDelegate_OutputDelegate__pf.BindUFunction(this,FName(TEXT("OnSuccess_2DCD53F3405B5E39758DD8AB796FA0A2")));
 				if(IsValid(b0l__CallFunc_CreateMoveToProxyObject_ReturnValue__pf))
 				{
 					b0l__CallFunc_CreateMoveToProxyObject_ReturnValue__pf->OnSuccess.Add(b0l__K2Node_CreateDelegate_OutputDelegate__pf);
 				}
-				CurrentState = 7;
+				CurrentState = 15;
 				break;
 			}
-		case 11:
+		case 19:
 			{
 				b0l__CallFunc_CreateMoveToProxyObject_ReturnValue__pf = UAIBlueprintHelperLibrary::CreateMoveToProxyObject(this, this, FVector(0.000000,0.000000,0.000000), b0l__K2Node_DynamicCast_AsPhysics_Ball_BP__pf, 5.000000, false);
-				CurrentState = 9;
+				CurrentState = 17;
 				break;
 			}
-		case 14:
+		case 22:
 			{
 				b0l__K2Node_DynamicCast_AsPhysics_Ball_BP__pf = Cast<APhysicsBallBP_C__pf3208112912>(b0l__K2Node_ComponentBoundEvent_Pawn__pf);
 				b0l__K2Node_DynamicCast_bSuccess__pf = (b0l__K2Node_DynamicCast_AsPhysics_Ball_BP__pf != nullptr);
@@ -589,12 +671,12 @@ void ABallCharacter_C__pf3208112912::bpf__ExecuteUbergraph_BallCharacter__pf_1(i
 					CurrentState = -1;
 					break;
 				}
-				CurrentState = 11;
+				CurrentState = 19;
 				break;
 			}
-		case 16:
+		case 24:
 			{
-				CurrentState = 14;
+				CurrentState = 22;
 				break;
 			}
 		default:
@@ -604,47 +686,47 @@ void ABallCharacter_C__pf3208112912::bpf__ExecuteUbergraph_BallCharacter__pf_1(i
 }
 void ABallCharacter_C__pf3208112912::bpf__ExecuteUbergraph_BallCharacter__pf_2(int32 bpp__EntryPoint__pf)
 {
-	check(bpp__EntryPoint__pf == 12);
+	check(bpp__EntryPoint__pf == 20);
 	return; // KCST_GotoReturn
 }
 void ABallCharacter_C__pf3208112912::bpf__ExecuteUbergraph_BallCharacter__pf_3(int32 bpp__EntryPoint__pf)
 {
-	check(bpp__EntryPoint__pf == 15);
+	check(bpp__EntryPoint__pf == 23);
 	// optimized KCST_UnconditionalGoto
 	b0l__Temp_byte_Variable__pf = b0l__K2Node_CustomEvent_MovementResult2__pf;
 	return; // KCST_GotoReturn
 }
 void ABallCharacter_C__pf3208112912::bpf__ExecuteUbergraph_BallCharacter__pf_4(int32 bpp__EntryPoint__pf)
 {
-	check(bpp__EntryPoint__pf == 20);
+	check(bpp__EntryPoint__pf == 26);
 	// optimized KCST_UnconditionalGoto
 	b0l__Temp_byte_Variable__pf = b0l__K2Node_CustomEvent_MovementResult__pf;
 	return; // KCST_GotoReturn
 }
+void ABallCharacter_C__pf3208112912::bpf__ReceiveTick__pf(float bpp__DeltaSeconds__pf)
+{
+	b0l__K2Node_Event_DeltaSeconds__pf = bpp__DeltaSeconds__pf;
+	bpf__ExecuteUbergraph_BallCharacter__pf_0(4);
+}
 void ABallCharacter_C__pf3208112912::bpf__ReceiveActorBeginOverlap__pf(AActor* bpp__OtherActor__pf)
 {
 	b0l__K2Node_Event_OtherActor__pf = bpp__OtherActor__pf;
-	bpf__ExecuteUbergraph_BallCharacter__pf_2(12);
+	bpf__ExecuteUbergraph_BallCharacter__pf_2(20);
 }
 void ABallCharacter_C__pf3208112912::bpf__BndEvt__PawnSensing_K2Node_ComponentBoundEvent_0_SeePawnDelegate__DelegateSignature__pf(APawn* bpp__Pawn__pf)
 {
 	b0l__K2Node_ComponentBoundEvent_Pawn__pf = bpp__Pawn__pf;
-	bpf__ExecuteUbergraph_BallCharacter__pf_1(16);
+	bpf__ExecuteUbergraph_BallCharacter__pf_1(24);
 }
-void ABallCharacter_C__pf3208112912::bpf__ReceiveTick__pf(float bpp__DeltaSeconds__pf)
-{
-	b0l__K2Node_Event_DeltaSeconds__pf = bpp__DeltaSeconds__pf;
-	bpf__ExecuteUbergraph_BallCharacter__pf_0(17);
-}
-void ABallCharacter_C__pf3208112912::bpf__OnSuccess_532655CE45AF1C7A41A6F8B8FB1362E7__pf(EPathFollowingResult::Type bpp__MovementResult__pf)
+void ABallCharacter_C__pf3208112912::bpf__OnSuccess_2DCD53F3405B5E39758DD8AB796FA0A2__pf(EPathFollowingResult::Type bpp__MovementResult__pf)
 {
 	b0l__K2Node_CustomEvent_MovementResult__pf = bpp__MovementResult__pf;
-	bpf__ExecuteUbergraph_BallCharacter__pf_4(20);
+	bpf__ExecuteUbergraph_BallCharacter__pf_4(26);
 }
-void ABallCharacter_C__pf3208112912::bpf__OnFail_532655CE45AF1C7A41A6F8B8FB1362E7__pf(EPathFollowingResult::Type bpp__MovementResult__pf)
+void ABallCharacter_C__pf3208112912::bpf__OnFail_2DCD53F3405B5E39758DD8AB796FA0A2__pf(EPathFollowingResult::Type bpp__MovementResult__pf)
 {
 	b0l__K2Node_CustomEvent_MovementResult2__pf = bpp__MovementResult__pf;
-	bpf__ExecuteUbergraph_BallCharacter__pf_3(15);
+	bpf__ExecuteUbergraph_BallCharacter__pf_3(23);
 }
 void ABallCharacter_C__pf3208112912::bpf__UserConstructionScript__pf()
 {

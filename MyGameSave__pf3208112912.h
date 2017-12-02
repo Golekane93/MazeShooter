@@ -26,6 +26,8 @@ public:
 	FVector bpv__PlayerStart2__pf;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, SaveGame, meta=(DisplayName="Level", Category="Default", OverrideNativeName="level"))
 	int32 bpv__level__pf;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(DisplayName="End", Category="Default", OverrideNativeName="end"))
+	bool bpv__end__pf;
 	UMyGameSave_C__pf3208112912(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	virtual void PostLoadSubobjects(FObjectInstancingGraph* OuterInstanceGraph) override;
 	static void __StaticDependenciesAssets(TArray<FBlueprintDependencyData>& AssetsToLoad);

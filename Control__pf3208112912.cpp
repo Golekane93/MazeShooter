@@ -399,8 +399,10 @@ void UControl_C__pf3208112912::__CustomDynamicClassInitialization(UDynamicClass*
 	__Local__21->Content = __Local__22;
 	__Local__4.Add(__Local__21);
 	auto __Local__26 = NewObject<UCanvasPanelSlot>(__Local__1, UCanvasPanelSlot::StaticClass(), TEXT("CanvasPanelSlot_7"));
-	__Local__26->LayoutData.Offsets.Left = 840.000000f;
-	__Local__26->LayoutData.Offsets.Top = 692.000000f;
+	__Local__26->LayoutData.Offsets.Left = -120.960938f;
+	__Local__26->LayoutData.Offsets.Top = 151.459473f;
+	__Local__26->LayoutData.Anchors.Minimum = FVector2D(0.500000, 0.500000);
+	__Local__26->LayoutData.Anchors.Maximum = FVector2D(0.500000, 0.500000);
 	__Local__26->bAutoSize = true;
 	__Local__26->Parent = __Local__1;
 	auto __Local__27 = NewObject<UTextBlock>(__Local__0, UTextBlock::StaticClass(), TEXT("TextBlock_5"));

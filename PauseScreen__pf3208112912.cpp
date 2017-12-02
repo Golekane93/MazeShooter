@@ -500,6 +500,7 @@ UPauseScreen_C__pf3208112912::UPauseScreen_C__pf3208112912(const FObjectInitiali
 		UPauseScreen_C__pf3208112912::__CustomDynamicClassInitialization(CastChecked<UDynamicClass>(GetClass()));
 	}
 	
+	bOverride_Cursor = true;
 }
 void UPauseScreen_C__pf3208112912::PostLoadSubobjects(FObjectInstancingGraph* OuterInstanceGraph)
 {

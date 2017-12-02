@@ -3,14 +3,16 @@
 #include "Runtime/Engine/Classes/GameFramework/Character.h"
 #include "Runtime/AIModule/Classes/Navigation/PathFollowingComponent.h"
 #include "Runtime/CoreUObject/Classes/Object.h"
+class UAIAsyncTaskBlueprintProxy;
 class AActor;
 class APhysicsBallBP_C__pf3208112912;
 class APawn;
 class UVictory_C__pf3208112912;
+class USpotLightComponent;
 class UStaticMeshComponent;
 class USphereComponent;
 class UPawnSensingComponent;
-class UAIAsyncTaskBlueprintProxy;
+class USaveGame;
 class AEnemyProjectile_C__pf3208112912;
 #include "BallCharacter3__pf3208112912.generated.h"
 UCLASS(Blueprintable, BlueprintType, meta=(ReplaceConverted="/Game/RollingBP/Blueprints/BallCharacter3.BallCharacter3_C", OverrideNativeName="BallCharacter3_C"))
@@ -20,6 +22,10 @@ public:
 	GENERATED_BODY()
 	UDELEGATE(meta=(OverrideNativeName="OAISimpleDelegate__DelegateSignature"))
 	DECLARE_DYNAMIC_DELEGATE_OneParam(F__OAISimpleDelegate__DelegateSignature__SC, EPathFollowingResult::Type , MovementResult);
+	UPROPERTY(BlueprintReadWrite, NonTransactional, meta=(Category="Default", OverrideNativeName="SpotLight1"))
+	USpotLightComponent* bpv__SpotLight1__pf;
+	UPROPERTY(BlueprintReadWrite, NonTransactional, meta=(Category="Default", OverrideNativeName="SpotLight"))
+	USpotLightComponent* bpv__SpotLight__pf;
 	UPROPERTY(BlueprintReadWrite, NonTransactional, meta=(Category="Default", OverrideNativeName="Sphere2"))
 	UStaticMeshComponent* bpv__Sphere2__pf;
 	UPROPERTY(BlueprintReadWrite, NonTransactional, meta=(Category="Default", OverrideNativeName="Cone"))
@@ -42,8 +48,8 @@ public:
 	float bpv__EnemyEnergy__pf;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(DisplayName="Distance from Enemy", Category="Default", OverrideNativeName="DistanceFromEnemy"))
 	float bpv__DistanceFromEnemy__pf;
-	UPROPERTY(Transient, DuplicateTransient, meta=(OverrideNativeName="CallFunc_SetGamePaused_ReturnValue"))
-	bool b0l__CallFunc_SetGamePaused_ReturnValue__pf;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(DisplayName="Save Sub", Category="Default", OverrideNativeName="SaveSub"))
+	USaveGame* bpv__SaveSub__pf;
 	UPROPERTY(Transient, DuplicateTransient, meta=(OverrideNativeName="K2Node_CustomEvent_MovementResult"))
 	TEnumAsByte<EPathFollowingResult::Type> b0l__K2Node_CustomEvent_MovementResult__pf;
 	UPROPERTY(Transient, DuplicateTransient, meta=(OverrideNativeName="Temp_byte_Variable"))
@@ -92,8 +98,26 @@ public:
 	float b0l__K2Node_Event_DeltaSeconds__pf;
 	UPROPERTY(Transient, DuplicateTransient, meta=(OverrideNativeName="CallFunc_GreaterEqual_FloatFloat_ReturnValue"))
 	bool b0l__CallFunc_GreaterEqual_FloatFloat_ReturnValue__pf;
-	UPROPERTY(Transient, DuplicateTransient, meta=(OverrideNativeName="CallFunc_Less_FloatFloat_ReturnValue"))
-	bool b0l__CallFunc_Less_FloatFloat_ReturnValue__pf;
+	UPROPERTY(Transient, DuplicateTransient, meta=(OverrideNativeName="CallFunc_LessEqual_FloatFloat_ReturnValue"))
+	bool b0l__CallFunc_LessEqual_FloatFloat_ReturnValue__pf;
+	UPROPERTY(Transient, DuplicateTransient, meta=(OverrideNativeName="CallFunc_LessEqual_FloatFloat_ReturnValue2"))
+	bool b0l__CallFunc_LessEqual_FloatFloat_ReturnValue2__pf;
+	UPROPERTY(Transient, DuplicateTransient, meta=(OverrideNativeName="CallFunc_GreaterEqual_FloatFloat_ReturnValue2"))
+	bool b0l__CallFunc_GreaterEqual_FloatFloat_ReturnValue2__pf;
+	UPROPERTY(Transient, DuplicateTransient, meta=(OverrideNativeName="CallFunc_BooleanAND_ReturnValue"))
+	bool b0l__CallFunc_BooleanAND_ReturnValue__pf;
+	UPROPERTY(Transient, DuplicateTransient, meta=(OverrideNativeName="CallFunc_LessEqual_FloatFloat_ReturnValue3"))
+	bool b0l__CallFunc_LessEqual_FloatFloat_ReturnValue3__pf;
+	UPROPERTY(Transient, DuplicateTransient, meta=(OverrideNativeName="CallFunc_LessEqual_FloatFloat_ReturnValue4"))
+	bool b0l__CallFunc_LessEqual_FloatFloat_ReturnValue4__pf;
+	UPROPERTY(Transient, DuplicateTransient, meta=(OverrideNativeName="CallFunc_GreaterEqual_FloatFloat_ReturnValue3"))
+	bool b0l__CallFunc_GreaterEqual_FloatFloat_ReturnValue3__pf;
+	UPROPERTY(Transient, DuplicateTransient, meta=(OverrideNativeName="CallFunc_GreaterEqual_FloatFloat_ReturnValue4"))
+	bool b0l__CallFunc_GreaterEqual_FloatFloat_ReturnValue4__pf;
+	UPROPERTY(Transient, DuplicateTransient, meta=(OverrideNativeName="CallFunc_BooleanAND_ReturnValue2"))
+	bool b0l__CallFunc_BooleanAND_ReturnValue2__pf;
+	UPROPERTY(Transient, DuplicateTransient, meta=(OverrideNativeName="CallFunc_BooleanAND_ReturnValue3"))
+	bool b0l__CallFunc_BooleanAND_ReturnValue3__pf;
 	ABallCharacter3_C__pf3208112912(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	virtual void PostLoadSubobjects(FObjectInstancingGraph* OuterInstanceGraph) override;
 	static void __StaticDependenciesAssets(TArray<FBlueprintDependencyData>& AssetsToLoad);
@@ -109,10 +133,10 @@ public:
 	void bpf__ReceiveActorBeginOverlap__pf(AActor* bpp__OtherActor__pf);
 	UFUNCTION(meta=(OverrideNativeName="BndEvt__PawnSensing_K2Node_ComponentBoundEvent_0_SeePawnDelegate__DelegateSignature"))
 	virtual void bpf__BndEvt__PawnSensing_K2Node_ComponentBoundEvent_0_SeePawnDelegate__DelegateSignature__pf(APawn* bpp__Pawn__pf);
-	UFUNCTION(BlueprintCallable, meta=(Category, OverrideNativeName="OnSuccess_816E260A471CC35B692C269C83D17BD3"))
-	virtual void bpf__OnSuccess_816E260A471CC35B692C269C83D17BD3__pf(EPathFollowingResult::Type bpp__MovementResult__pf);
-	UFUNCTION(BlueprintCallable, meta=(Category, OverrideNativeName="OnFail_816E260A471CC35B692C269C83D17BD3"))
-	virtual void bpf__OnFail_816E260A471CC35B692C269C83D17BD3__pf(EPathFollowingResult::Type bpp__MovementResult__pf);
+	UFUNCTION(BlueprintCallable, meta=(Category, OverrideNativeName="OnSuccess_D8F27C81497D6AFB0FE9F3BC82948201"))
+	virtual void bpf__OnSuccess_D8F27C81497D6AFB0FE9F3BC82948201__pf(EPathFollowingResult::Type bpp__MovementResult__pf);
+	UFUNCTION(BlueprintCallable, meta=(Category, OverrideNativeName="OnFail_D8F27C81497D6AFB0FE9F3BC82948201"))
+	virtual void bpf__OnFail_D8F27C81497D6AFB0FE9F3BC82948201__pf(EPathFollowingResult::Type bpp__MovementResult__pf);
 	UFUNCTION(BlueprintCallable, meta=(BlueprintInternalUseOnly="true", DisplayName="Construction Script", ToolTip="Construction script, the place to spawn components and do other setup.@note Name used in CreateBlueprint function@param       Location        The location.@param       Rotation        The rotation.", Category, CppFromBpEvent, OverrideNativeName="UserConstructionScript"))
 	void bpf__UserConstructionScript__pf();
 public:
